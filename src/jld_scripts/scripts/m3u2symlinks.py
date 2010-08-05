@@ -44,6 +44,7 @@ susage="""Usage: %s [options] source.m3u dest_path""" % sname
 soptions=[
           #(["-c", "--clean"], {"dest":"clean", "help":"Clean the target directory before processing", "action":"store_true", "default":False})
           (["-q", "--quiet"],   {"dest":"quiet",   "help":"Quiets message generation on stdout", "action":"store_true", "default":False})
+          ,(["-v", "--verbose"],{"dest":"verbose", "help":"Generate progress information", "action":"store_true", "default":False})
          ,(["-r", "--refresh"], {"dest":"refresh", "help":"Refresh any existing symlink", "action":"store_true", "default":False})
          ,(["-g", "--gen"],     {"dest":"gen",     "help":"Generate summary .m3u files",  "action":"store_true", "default":False})
          ]
@@ -56,7 +57,9 @@ messages={ "args":                  "Missing arguments"
           ,"m3u_readfailed":        "Failed to process .m3u input file"
           ,"mutagen_missing":       "Missing 'mutagen' python package"
           ,"top_fail":              "Failed to create top level directories in target directory"
-          ,"artist_dir_failed":      "Error creating 'artist' directory: %s"
+          ,"artist_dir_failed":      "Creating 'artist' directory: %s"
+          ,"error_symlink":          "Creating symlink: %s"
+          ,"error_genmusic":         "Generating music symlinks: %s"
           }
 
 
@@ -118,9 +121,45 @@ def main():
         
     music, unknown, dups=_process(um, targetdir, m3u.files)
     
-    print "*** music: ", music
-    print "*** unknown: ", unknown
-    print "*** dups: ", dups
+    #print "*** music: ", music
+    #print "*** unknown: ", unknown
+    #print "*** dups: ", dups
+
+    try:
+        _gen_music_dir(options.verbose, um, targetdir, music, options.refresh)
+    except Exception, e:
+        um.error(messages["error_genmusic"] % e)
+        
+def _gen_music_dir(verbose, um, targetdir, music, refresh):
+    for link_name, entry in music.iteritems():
+        file, details=entry
+        artist, album, _title = details
+        if verbose:
+            print "> processing music file: %s" % file
+            
+        ## generate album sub-dir
+        ad=os.path.join(targetdir, "m", artist, album)
+        
+        ## don't worry if we can't create the 'album' sub-dir just yet
+        safe_makedirs(ad)
+
+        link_path=os.path.join(targetdir, "m", artist, album, link_name)
+        
+        exists=os.path.islink(link_path)
+        if exists:
+            if verbose:
+                print "! symlink exists: %s" % link_path
+            if refresh:
+                try:    os.unlink(link_path)
+                except: pass
+
+        if not exists or (exists and refresh):                
+            try:
+                os.symlink(file, link_path)
+            except:
+                um.error(messages["error_symlink"] % link_path)
+                sys.exit(1)
+            
         
 
 def _create_top_level_dirs(targetdir):
@@ -145,8 +184,11 @@ def _process(um, targetdir, files):
     ## Gather ID3 information
     for file in files:
         try:
-            details=get_id3_params(file)
-            valid.append((file, details))
+            artist, album, title=get_id3_params(file)
+            
+            ea=artist.encode("UTF-8").replace("/", "_").strip()
+            eb=album.encode("UTF-8").replace("/", "_").strip()
+            valid.append((file, (ea, eb, title.strip())))
         except:
             unknown.append(file)
 
@@ -170,6 +212,7 @@ def _process(um, targetdir, files):
     ## Manage Dups
     for entry in music.iteritems():
         link_name, list=entry
+        first=list[0]
         if len(list) > 1:
             count=1
             for item in list:
@@ -177,6 +220,8 @@ def _process(um, targetdir, files):
                 new_link_name="%s.%s" % (link_name, count)
                 count+=1
                 dups.append((new_link_name, file))
+        music[link_name]=first
+            
                 
     ## create top level artist directories
     for artist in artists:
