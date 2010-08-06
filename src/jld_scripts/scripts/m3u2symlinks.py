@@ -60,6 +60,7 @@ messages={ "args":                  "Missing arguments"
           ,"artist_dir_failed":      "Creating 'artist' directory: %s"
           ,"error_symlink":          "Creating symlink: %s"
           ,"error_genmusic":         "Generating music symlinks: %s"
+          ,"errog_gendups":          "Generating duplicates symlinks: %s"
           }
 
 
@@ -129,6 +130,44 @@ def main():
         _gen_music_dir(options.verbose, um, targetdir, music, options.refresh)
     except Exception, e:
         um.error(messages["error_genmusic"] % e)
+    
+    try:
+        _gen_dups_dir(options.verbose, um, targetdir, dups, options.refresh)
+    except Exception,e:
+        um.error(messages["errog_gendups"] % e)
+        
+        
+def _gen_dups_dir(verbose, um, targetdir, dups, refresh):
+    for _link_name, list in dups.iteritems():
+        for entry in list:
+            new_link_name, file, details=entry
+            artist, album, _title = details
+            if verbose:
+                print "> processing duplicate file: %s" % file
+    
+            ## generate album sub-dir
+            ad=os.path.join(targetdir, "d", artist, album)
+    
+            ## don't worry if we can't create the 'album' sub-dir just yet
+            safe_makedirs(ad)
+        
+            link_path=os.path.join(targetdir, "d", artist, album, new_link_name)
+                    
+            exists=os.path.islink(link_path)
+            if exists:
+                if verbose:
+                    print "! symlink exists: %s" % link_path
+                if refresh:
+                    try:    os.unlink(link_path)
+                    except: pass
+    
+            if not exists or (exists and refresh):                
+                try:
+                    os.symlink(file, link_path)
+                except:
+                    um.error(messages["error_symlink"] % link_path)
+                    sys.exit(1)
+
         
 def _gen_music_dir(verbose, um, targetdir, music, refresh):
     for link_name, entry in music.iteritems():
@@ -176,7 +215,7 @@ def _process(um, targetdir, files):
     
     valid=[]
     unknown=[]
-    dups=[]
+    dups={}
     music={}
     
     artists=[]
@@ -215,14 +254,16 @@ def _process(um, targetdir, files):
         first=list[0]
         if len(list) > 1:
             count=1
+            dup=[]
             for item in list:
                 file, details=item
                 new_link_name="%s.%s" % (link_name, count)
                 count+=1
-                dups.append((new_link_name, file))
+                dup.append((new_link_name, file, details))
+            dups[link_name]=dup
         music[link_name]=first
             
-                
+    """        
     ## create top level artist directories
     for artist in artists:
         ma=os.path.join(targetdir, "m", artist)
@@ -234,7 +275,8 @@ def _process(um, targetdir, files):
         if not safe_makedirs(da):
             um.error(messages["artist_dir_failed"] % da)
             sys.exit(1)
-        
+    """
+     
     return music, unknown, dups
 
 
