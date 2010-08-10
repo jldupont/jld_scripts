@@ -4,7 +4,7 @@
 """
 import os
 
-__all__=["safe_makedirs"]
+__all__=["safe_makedirs", "get_dir_files"]
 
 def safe_makedirs(path, mode=0777, ex=False):
     """
@@ -24,3 +24,25 @@ def safe_makedirs(path, mode=0777, ex=False):
         else:
             if not result:
                 raise Exception()
+
+
+def get_dir_files(path, ext="mp3"):
+    """
+    Retrieves the list of files with extension `ext`
+    in the path specified.
+    
+    If the path specified isn't a directory, the usual
+    exception will be raised.
+    """
+    list=os.listdir(path)
+    result=[]
+    for item in list:
+        name=os.path.basename(item)
+        try:
+            bits=name.split(".")
+            extension=bits[-1:][0].lower()
+        except:
+            extension=None
+        if ext==extension:
+            result.append(os.path.join(path, name))
+    return result
