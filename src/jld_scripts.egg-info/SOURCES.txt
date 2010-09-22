@@ -9,6 +9,7 @@ src/jld_scripts/music/__init__.py
 src/jld_scripts/music/m3ufile.py
 src/jld_scripts/music/mp3file.py
 src/jld_scripts/scripts/__init__.py
+src/jld_scripts/scripts/id3info.py
 src/jld_scripts/scripts/m3u2symlinks.py
 src/jld_scripts/system/__init__.py
 src/jld_scripts/system/logger.py
