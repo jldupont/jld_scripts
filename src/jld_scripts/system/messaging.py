@@ -11,9 +11,10 @@ class UserMessaging(object):
     wtpl="(warning) %s"
     etpl="(error) %s"
     
-    def __init__(self, name, quiet):
+    def __init__(self, name, quiet, prepend=""):
         self.quiet=quiet
         self.name=name
+        self.prepend=prepend
         
     def info(self, msg):
         self._maybeOutput( self.itpl % msg )
@@ -28,5 +29,5 @@ class UserMessaging(object):
     
     def _maybeOutput(self, msg):
         if not self.quiet:
-            print "%s: %s" % (self.name, msg)
+            print "%s%s: %s" % (self.prepend, self.name, msg)
                 
