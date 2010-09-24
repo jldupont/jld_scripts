@@ -6,6 +6,7 @@ src/jld_scripts.egg-info/dependency_links.txt
 src/jld_scripts.egg-info/not-zip-safe
 src/jld_scripts.egg-info/top_level.txt
 src/jld_scripts/music/__init__.py
+src/jld_scripts/music/id3.py
 src/jld_scripts/music/m3ufile.py
 src/jld_scripts/music/mp3file.py
 src/jld_scripts/scripts/__init__.py
@@ -16,4 +17,5 @@ src/jld_scripts/system/logger.py
 src/jld_scripts/system/messaging.py
 src/jld_scripts/system/oparser.py
 src/jld_scripts/system/path.py
+src/scripts/id3info
 src/scripts/m3u2symlinks
