@@ -1,4 +1,6 @@
 """
+    Path related utilities
+    
     @author: jldupont
     @date: Aug 4, 2010
 """

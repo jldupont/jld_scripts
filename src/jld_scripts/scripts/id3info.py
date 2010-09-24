@@ -40,11 +40,13 @@ messages={ "args":        "Missing arguments"
 
 usual_frames=[  "TCON",  ## CONTENT TYPE
                 "TPE1",  ## Artist 
+                "TPE2",  ## BAND
                 "TRCK",  ## Track#
                 "TDRC",  ## YEAR 
                 "TALB"   ## ALBUM
                 ,"TIT2"  ## Track Title
                 ,"TLAN"  ## Languages
+                ,"TLEN"  ## LENGTH
                 ]
 
 def main():
@@ -85,6 +87,10 @@ def main():
         
     if is_file:
         files=[].append(path)
+        
+    if files is None:
+        um.error(messages["error_path"])
+        sys.exit(1)       
         
     if len(files) == 0:
         um.info(messages["zero_file"])
