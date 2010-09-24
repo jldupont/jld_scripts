@@ -9,4 +9,4 @@ More information available [here](http://www.systemical.com/doc/opensource/jld_s
 History
 =======
 
-0.5.1: corrected missing 'id3info' in /usr/bin
+0.5.2: corrected missing 'id3info' in /usr/bin
