@@ -32,6 +32,7 @@ class Handler(BaseHandler):
     
     def __init__(self, debug=False):
         BaseHandler.__init__(self, debug)
+        self.page_props={}
         self.tracks=[]
         self.currentTag={}
         self.sm= {
@@ -92,6 +93,7 @@ class Handler(BaseHandler):
     def do_tracks(self, event):
         self.do_grab_attrs(event)
         self.do_skip(event)
+        self.page_props=self.props
 
     def do_begin_track(self, event):
         if self.debug:
@@ -1221,3 +1223,5 @@ if __name__=="__main__":
     handler=Handler(debug=False)
     process(r_test, handler)
     print handler.tracks
+    pp=handler.page_props["tracks.attrs"]
+    print "perPage: %s, totalPages: %s" % (pp["perPage"], pp["totalPages"])
