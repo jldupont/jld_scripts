@@ -19,7 +19,7 @@ __all__=["parse"]
 def parse(xml, debug=False):
     handler=Handler(debug)
     process(xml, handler)
-    return handler.props
+    return handler
 
             
 
