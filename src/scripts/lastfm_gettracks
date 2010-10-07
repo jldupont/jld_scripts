@@ -6,13 +6,10 @@
 import os
 import sys
 
-print os.environ.keys()
-
 if "JLD_SCRIPTS" in os.environ:
 	this_dir=os.path.dirname(__file__)
 	lib_path=os.path.abspath(os.path.join(this_dir, ".."))
 	sys.path.insert(0, lib_path)
-	print lib_path
 	
 from jld_scripts.scripts.lastfm_gettracks import main
 

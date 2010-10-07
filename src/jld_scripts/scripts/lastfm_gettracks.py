@@ -129,10 +129,17 @@ def write_result(data):
         
     
 def format_line(line_data):
-    n=line_data["name"]
-    a=line_data["artist.name"]
-    p=line_data["playcount"]
-    return "%s %s %s\r" % (a, n, p)
+    n=format_item( line_data["name"] )
+    a=format_item( line_data["artist.name"])
+    p=format_item( line_data["playcount"] )
+    return "%s  %s  %s\r" % (a, n, p)
+    
+def format_item(item):
+    while True:
+        item=item.replace("  ", " ")
+        if item.find("  ")==-1:
+            break
+    return item
     
 def process_page(username, page):
     """
