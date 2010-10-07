@@ -16,7 +16,7 @@ from jld_scripts.music.lastfm.parser_gettracks import parse
 #from jld_scripts.system.path import get_dir_files
 #from jld_scripts.music.id3 import known_frames
 
-TIMEOUT = 4
+TIMEOUT = 30
 LIBRARY_GETTRACKS_URL="http://ws.audioscrobbler.com/2.0/?method=library.gettracks&user=%s&page=%s&api_key=%s"
 API_KEY="50fa3794354dd9d42fc251416f523388"
 
@@ -25,6 +25,7 @@ sname="lastfm_gettracks"
 susage="""Usage: %s [options] username
 
 Fetches the XML data pages of tracks related to a user's library on Last.fm 
+NOTE: make sure the user's profile is set to 'public'
 """ % sname
 soptions=[
           #(["-c", "--clean"], {"dest":"clean", "help":"Clean the target directory before processing", "action":"store_true", "default":False})
@@ -33,7 +34,7 @@ soptions=[
           ,(["-w",  "--webhelp"], {"dest":"webhelp", "help":"Opens a online documentation", "action":"store_true", "default":False})
          ]
 
-messages={ "args":        "Missing arguments"
+messages={ "args":        "Invalid arguments"
           ,"error_path":  "Invalid path specified"
           ,"error_page":  "Invalid 'page' argument"
           ,"error_dir":   "Invalid path: cannot be a directory"
@@ -57,21 +58,8 @@ def main():
         webbrowser.open(webhelp_url)
         sys.exit(0)
     
-    if len(args) != 2:
+    if len(args) != 1:
         um.error(messages["args"])
-        sys.exit(1)
-
-    try:      path=os.path.expanduser(args[1])
-    except:   path=None
-
-    try:      is_dir=os.path.isdir(path)
-    except:
-        um.error(messages["error_path"])
-        sys.exit(1)
-        
-    ## if the user specified a directory, get all the .mp3 files then
-    if is_dir:
-        um.error(messages["error_dir"])
         sys.exit(1)
 
     page=None
@@ -81,10 +69,10 @@ def main():
             um.error(messages["error_page"])
             sys.exit(1)
 
-    print "username: %s, path: %s, page: %s, all: %s" % (args[0], path, page, page is None)
+    #print "username: %s, path: %s, page: %s, all: %s" % (args[0], path, page, page is None)
 
     try:
-        process(args[0], path, page, page is None)
+        process(args[0], page, page is None, options.quiet)
     except Exception,e:
         um.error(messages["error_proc"] % e)
         sys.exit(1)
@@ -92,54 +80,59 @@ def main():
     sys.exit(0)
 
 def fetch_page(username, page):
+    """
+    Fetches 1 page from library.gettracks on Last.fm
+    """
     ua=urllib.quote_plus(username.encode("utf-8"))
     url=LIBRARY_GETTRACKS_URL % (ua, page, API_KEY)
     raw=urllib2.urlopen(url, None, TIMEOUT)
     resp=raw.read()
     return resp
 
-def process(username, path, page, all):
+def process(username, page, all, quiet):
     if all:
-        process_all(username, path)
+        process_all(username, quiet)
     else:
-        process_one(username, path, page)
+        process_one(username, page)
       
-def process_all(username, path):
+def process_all(username, quiet):
 
-    ## start with page 1
-    num_pages, data=process_page(username, 1)
+    ## start with page 1 to get # of pages in total
+    num_pages_raw, data=process_page(username, 1)
+    
+    try: num_pages=int(num_pages_raw)
+    except:
+        raise Exception("problem with 'totalPages' parameter")
+    
+    if not quiet:
+        print "# number of pages: %s" % num_pages
     
     for page in range(2, num_pages):
+        if not quiet:
+            print "# processing page: %s" % page
         _, pdata=process_page(username, page)
-        data.append(pdata)
+        write_result(pdata)
+            
     
     write_result(data)
     
 
-def process_one(username, path, page):
+def process_one(username, page):
     _, data=process_page(username, page)
-    write_result(path, data)
+    write_result(data)
 
     
-def write_result(path, data):
-    try:
-        file=open(path, "w")
-        for line in data:
-            formatted_line=format_line(line)
-            file.write(formatted_line)
-        file.close()
-        return (True, [])
-    except:
-        raise
-    finally:
-        try:    file.close()
-        except: pass
+def write_result(data):
+    for line in data:
+        formatted_line=format_line(line)
+        print formatted_line
         
-def extract_page_data(data):
-    pass
     
 def format_line(line_data):
-    pass
+    n=line_data["name"]
+    a=line_data["artist.name"]
+    p=line_data["playcount"]
+    return "%s %s %s\r" % (a, n, p)
     
 def process_page(username, page):
     """
@@ -148,8 +141,8 @@ def process_page(username, page):
     try:
         page1=fetch_page(username, page)
         result=parse(page1, debug=False)
-    except:
-        raise Exception("error fetching/processing page %s" % page)
+    except Exception, e:
+        raise Exception("error fetching/processing page %s: %s" % (page, e))
     
     try:
         props=result.page_props["tracks.attrs"]
@@ -157,7 +150,7 @@ def process_page(username, page):
         raise Exception("error recovering page properties")
     
     try:
-        page_data_raw=result.tracks
+        data=result.tracks
     except:
         raise Exception("error recovering page data")
     
@@ -165,11 +158,6 @@ def process_page(username, page):
         num_pages=props["totalPages"]
     except:
         raise Exception("missing 'totalPages' field")
-    
-    try:
-        data=extract_page_data(page_data_raw)
-    except:
-        raise Exception("error extracting page %s data" % page)
     
     return (num_pages, data)
 
