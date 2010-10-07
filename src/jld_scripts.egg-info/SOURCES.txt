@@ -9,8 +9,12 @@ src/jld_scripts/music/__init__.py
 src/jld_scripts/music/id3.py
 src/jld_scripts/music/m3ufile.py
 src/jld_scripts/music/mp3file.py
+src/jld_scripts/music/lastfm/__init__.py
+src/jld_scripts/music/lastfm/base.py
+src/jld_scripts/music/lastfm/parser_gettracks.py
 src/jld_scripts/scripts/__init__.py
 src/jld_scripts/scripts/id3info.py
+src/jld_scripts/scripts/lastfm_gettracks.py
 src/jld_scripts/scripts/m3u2symlinks.py
 src/jld_scripts/system/__init__.py
 src/jld_scripts/system/logger.py
@@ -18,4 +22,5 @@ src/jld_scripts/system/messaging.py
 src/jld_scripts/system/oparser.py
 src/jld_scripts/system/path.py
 src/scripts/id3info
+src/scripts/lastfm_gettracks
 src/scripts/m3u2symlinks

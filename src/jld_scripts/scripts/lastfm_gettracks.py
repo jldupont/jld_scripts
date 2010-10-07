@@ -106,6 +106,9 @@ def process_all(username, verbose):
     
     if verbose:
         print "# number of pages: %s" % num_pages
+        print "# processing page: 1"
+    
+    write_result(data)
     
     for page in range(2, num_pages):
         if verbose:
@@ -127,7 +130,7 @@ def process_one(username, page, verbose):
 def write_result(data):
     for line in data:
         formatted_line=format_line(line)
-        print formatted_line
+        print formatted_line.encode("utf8")
         
     
 def format_line(line_data):
