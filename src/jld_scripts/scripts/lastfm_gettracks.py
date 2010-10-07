@@ -105,11 +105,51 @@ def process(username, path, page, all):
         process_one(username, path, page)
       
 def process_all(username, path):
+
+    ## start with page 1
+    num_pages, data=process_page(username, 1)
+    
+    for page in range(2, num_pages):
+        _, pdata=process_page(username, page)
+        data.append(pdata)
+    
+    write_result(data)
+    
+
+def process_one(username, path, page):
+    _, data=process_page(username, page)
+    write_result(path, data)
+
+    
+def write_result(path, data):
     try:
-        page1=fetch_page(username, 1)
-        result=parse(page1, debug=False)
+        file=open(path, "w")
+        for line in data:
+            formatted_line=format_line(line)
+            file.write(formatted_line)
+        file.close()
+        return (True, [])
     except:
         raise
+    finally:
+        try:    file.close()
+        except: pass
+        
+def extract_page_data(data):
+    pass
+    
+def format_line(line_data):
+    pass
+    
+def process_page(username, page):
+    """
+    Fetches 1 page, parses it, extracts data
+    """
+    try:
+        page1=fetch_page(username, page)
+        result=parse(page1, debug=False)
+    except:
+        raise Exception("error fetching/processing page %s" % page)
     
     try:
         props=result.page_props["tracks.attrs"]
@@ -117,34 +157,22 @@ def process_all(username, path):
         raise Exception("error recovering page properties")
     
     try:
+        page_data_raw=result.tracks
+    except:
+        raise Exception("error recovering page data")
+    
+    try:
         num_pages=props["totalPages"]
     except:
         raise Exception("missing 'totalPages' field")
     
-    for page in range(2, num_pages):
-        pass
-    
-
-def process_one(username, path, page):
     try:
-        result=fetch_page(username, page)
-        write_result(path, result)
+        data=extract_page_data(page_data_raw)
     except:
-        raise
-        
+        raise Exception("error extracting page %s data" % page)
     
-def write_result(path, data):
-    try:
-        file=open(path, "w")
-        file.write(data)
-        file.close()
-        return (True, [])
-    except Exception, e:
-        return (False, e)
-        
-def process_page(data):
-    pass
-    
+    return (num_pages, data)
+
             
 if __name__=="__main__":
     main()
