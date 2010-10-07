@@ -29,9 +29,10 @@ NOTE: make sure the user's profile is set to 'public'
 """ % sname
 soptions=[
           #(["-c", "--clean"], {"dest":"clean", "help":"Clean the target directory before processing", "action":"store_true", "default":False})
-           (["-v", "--verbose"],   {"dest":"verbose",  "help":"More information to stdout", "action":"store_true", "default":False})         
-           ,(["-p", "--page"],    {"dest":"page",   "help":"Specifies which page# to download", "action":"store", "default":False, "nargs":1})
-          ,(["-w",  "--webhelp"], {"dest":"webhelp", "help":"Opens a online documentation", "action":"store_true", "default":False})
+           (["-v", "--verbose"],  {"dest":"verbose",  "help":"More information to stdout", "action":"store_true", "default":False})         
+           ,(["-p", "--page"],    {"dest":"page",     "help":"Specifies which page# to download", "action":"store", "default":False, "nargs":1})
+           ,(["-f", "--fwd"],     {"dest":"fwd",      "help":"Go forward from 'page' i.e. download all starting from 'page'", "action":"store_true", "default":False})
+          ,(["-w",  "--webhelp"], {"dest":"webhelp",  "help":"Opens a online documentation", "action":"store_true", "default":False})
          ]
 
 messages={ "args":        "Invalid arguments"
@@ -62,17 +63,30 @@ def main():
         um.error(messages["args"])
         sys.exit(1)
 
-    page=None
+    """
+    -p and -f    : download all from 'page' onwards
+    -p           : download only 'page'
+    -f           : download all from page 1
+    *no options* : download all from page 1 
+    """
+
+    all_pages=True
+    page=1
     if options.page:
-        try:    page=int(options.page)
+        try:    
+            page=int(options.page)
         except:
             um.error(messages["error_page"])
             sys.exit(1)
 
-    #print "username: %s, path: %s, page: %s, all: %s" % (args[0], path, page, page is None)
+    if not options.fwd and options.page:
+        all_pages=False
+
+    if options.verbose:
+        print "## username: %s, page: %s, all: %s" % (args[0], page, all_pages)
 
     try:
-        process(args[0], page, page is None, options.verbose)
+        process(args[0], page, all_pages, options.verbose)
     except Exception,e:
         um.error(messages["error_proc"] % e)
         sys.exit(1)
@@ -91,26 +105,29 @@ def fetch_page(username, page):
 
 def process(username, page, all, verbose):
     if all:
-        process_all(username, verbose)
+        process_all(username, page, verbose)
     else:
         process_one(username, page, verbose)
       
-def process_all(username, verbose):
+def process_all(username, from_page, verbose):
 
     ## start with page 1 to get # of pages in total
-    num_pages_raw, data=process_page(username, 1)
+    num_pages_raw, data=process_page(username, from_page)
     
     try: num_pages=int(num_pages_raw)
     except:
         raise Exception("problem with 'totalPages' parameter")
+
+    if from_page > num_pages:
+        raise Exception("Invalid start page")
     
     if verbose:
         print "# number of pages: %s" % num_pages
-        print "# processing page: 1"
+        print "# processing page: %s" % from_page
     
     write_result(data)
     
-    for page in range(2, num_pages):
+    for page in range(from_page+1, num_pages+1):
         if verbose:
             print "# processing page: %s" % page
         _, pdata=process_page(username, page)
