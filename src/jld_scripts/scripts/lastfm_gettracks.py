@@ -4,7 +4,7 @@
     Created on 2010-10-04
     @author: jldupont
 """
-import os
+#import os
 import sys
 import optparse
 import urllib2
@@ -29,7 +29,7 @@ NOTE: make sure the user's profile is set to 'public'
 """ % sname
 soptions=[
           #(["-c", "--clean"], {"dest":"clean", "help":"Clean the target directory before processing", "action":"store_true", "default":False})
-           (["-q", "--quiet"],   {"dest":"quiet",  "help":"Quiets message generation on stdout", "action":"store_true", "default":False})         
+           (["-v", "--verbose"],   {"dest":"verbose",  "help":"More information to stdout", "action":"store_true", "default":False})         
            ,(["-p", "--page"],    {"dest":"page",   "help":"Specifies which page# to download", "action":"store", "default":False, "nargs":1})
           ,(["-w",  "--webhelp"], {"dest":"webhelp", "help":"Opens a online documentation", "action":"store_true", "default":False})
          ]
@@ -51,7 +51,7 @@ def main():
         sys.exit(1)
         
     options, args=o.parse()
-    um=UserMessaging(sname, False)
+    um=UserMessaging(sname, False, prepend="#")
       
     if options.webhelp:
         import webbrowser
@@ -72,7 +72,7 @@ def main():
     #print "username: %s, path: %s, page: %s, all: %s" % (args[0], path, page, page is None)
 
     try:
-        process(args[0], page, page is None, options.quiet)
+        process(args[0], page, page is None, options.verbose)
     except Exception,e:
         um.error(messages["error_proc"] % e)
         sys.exit(1)
@@ -89,13 +89,13 @@ def fetch_page(username, page):
     resp=raw.read()
     return resp
 
-def process(username, page, all, quiet):
+def process(username, page, all, verbose):
     if all:
-        process_all(username, quiet)
+        process_all(username, verbose)
     else:
-        process_one(username, page)
+        process_one(username, page, verbose)
       
-def process_all(username, quiet):
+def process_all(username, verbose):
 
     ## start with page 1 to get # of pages in total
     num_pages_raw, data=process_page(username, 1)
@@ -104,11 +104,11 @@ def process_all(username, quiet):
     except:
         raise Exception("problem with 'totalPages' parameter")
     
-    if not quiet:
+    if verbose:
         print "# number of pages: %s" % num_pages
     
     for page in range(2, num_pages):
-        if not quiet:
+        if verbose:
             print "# processing page: %s" % page
         _, pdata=process_page(username, page)
         write_result(pdata)
@@ -117,7 +117,9 @@ def process_all(username, quiet):
     write_result(data)
     
 
-def process_one(username, page):
+def process_one(username, page, verbose):
+    if verbose:
+        print "# Processing page: %s" % page
     _, data=process_page(username, page)
     write_result(data)
 
@@ -129,8 +131,8 @@ def write_result(data):
         
     
 def format_line(line_data):
-    n=format_item( line_data["name"] )
     a=format_item( line_data["artist.name"])
+    n=format_item( line_data["name"] )
     p=format_item( line_data["playcount"] )
     return "%s  %s  %s\r" % (a, n, p)
     
