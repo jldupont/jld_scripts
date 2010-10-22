@@ -22,6 +22,7 @@ class MKSignalRx(dbus.service.Object):
     
     def __init__(self, agent):
         dbus.service.Object.__init__(self, dbus.SystemBus(), self.PATH) ## not sure we need this just to receive signals...
+        self.agent=agent
         
         dbus.SystemBus().add_signal_receiver(self.sCondition,
                                        signal_name="Condition",
