@@ -30,9 +30,10 @@ def notify(app_name, msg, icon_name="important"):
         pynotify.init(app_name)
         n=pynotify.Notification(app_name, msg, icon_name)
         n.show()
+        return n
     except:
         print "%s: %s" % (app_name, msg)
-    
+
 
 class NotifierAgent(AgentThreadedBase):
     
@@ -45,9 +46,9 @@ class NotifierAgent(AgentThreadedBase):
         self.types=["w", "e", "warning", "error"]
         
     def h_notify(self, msg):
-        """ 
+        '''
         Direct access to the notification facility
-        """
+        '''
         n=pynotify.Notification(self.app_name, msg, self.icon_name)
         n.show()
         

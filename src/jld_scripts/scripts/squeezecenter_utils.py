@@ -4,7 +4,6 @@
     Created on 2010-10-21
     @author: jldupont
 """
-#import os
 import sys
 
 APP_NAME="SqueezeCenter Utils"
@@ -18,32 +17,34 @@ MSWITCH_DEBUG_INTEREST=False
 DEV_MODE=True
 ###>>>
 
-try:
-    import pysqueezecenter #@UnresolvedImport @UnusedImport
-except:
-    from jld_scripts.agents.notifier import notify #@Reimport
-    notify(APP_NAME, "Package 'pysqueezecenter' is required")
-    sys.exit(1)
-
 import gobject
 import dbus.glib
 from dbus.mainloop.glib import DBusGMainLoop
 import gtk
 
+gobject.threads_init()  #@UndefinedVariable
+dbus.glib.init_threads()
+DBusGMainLoop(set_as_default=True)
+
+from jld_scripts.system import base as base
+base.debug=DEV_MODE
+base.debug_interest=MSWITCH_DEBUG_INTEREST
+
+from jld_scripts.system import mswitch #@UnusedImport
+mswitch.observe_mode=MSWITCH_OBSERVE_MODE
+mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
+
 
 def main():
     try:
-        gobject.threads_init()  #@UndefinedVariable
-        dbus.glib.init_threads()
-        DBusGMainLoop(set_as_default=True)
         
-        from jld_scripts.system import base as base
-        base.debug=DEV_MODE
-        base.debug_interest=MSWITCH_DEBUG_INTEREST
+        try:    
+            import pysqueezecenter #@UnresolvedImport @UnusedImport
+            a
+        except: 
+            raise Exception("package 'pysqueezecenter' is required")
+
         
-        from jld_scripts.system import mswitch #@UnusedImport
-        mswitch.observe_mode=MSWITCH_OBSERVE_MODE
-        mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
         
         from jld_scripts.res import get_res_path
         icon_path=get_res_path()
@@ -59,7 +60,6 @@ def main():
     except Exception,e:
         from jld_scripts.agents.notifier import notify #@Reimport
         notify(APP_NAME, "There was an error: %s" % e)
-        try:    gtk.main_quit()
-        except: pass
+        mswitch.publish("__main__", "__quit__")
         sys.exit(1)
 
