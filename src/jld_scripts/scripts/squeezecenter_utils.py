@@ -44,6 +44,8 @@ def main():
         
         from jld_scripts.agents.tray import TrayAgent
         _ta=TrayAgent(APP_NAME, icon_path, ICON_NAME, HELP_URL)
+
+        import jld_scripts.agents.mk_dbus 
         
         gtk.main()
         
