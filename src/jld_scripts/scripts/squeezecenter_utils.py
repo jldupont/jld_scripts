@@ -18,11 +18,17 @@ MSWITCH_DEBUG_INTEREST=False
 DEV_MODE=True
 ###>>>
 
+try:
+    import pysqueezecenter #@UnresolvedImport @UnusedImport
+except:
+    from jld_scripts.agents.notifier import notify #@Reimport
+    notify(APP_NAME, "Package 'pysqueezecenter' is required")
+    sys.exit(1)
+
 import gobject
 import dbus.glib
 from dbus.mainloop.glib import DBusGMainLoop
 import gtk
-
 
 
 def main():
