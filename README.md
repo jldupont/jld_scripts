@@ -3,6 +3,7 @@ Collection of python utility scripts
 - m3u2symlinks
 - id3info
 - lastfm_gettracks
+- squeezecenter_utils
 
 More information available [here](http://www.systemical.com/doc/opensource/jld_scripts).
 

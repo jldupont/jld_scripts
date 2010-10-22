@@ -5,4 +5,4 @@ clean:
 
 all:
 	find -iname *.pyc -exec rm {} \;
-	python setup.py bdist_egg upload
+	python setup.py sdist upload

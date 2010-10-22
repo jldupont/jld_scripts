@@ -19,10 +19,10 @@ setup(name=         'jld_scripts',
       package_dir=  {'': "src",},
       packages=     find_packages("src"),
       scripts=      ['src/scripts/m3u2symlinks', 'src/scripts/id3info', 'src/scripts/lastfm_gettracks'
+                     ,'src/scripts/squeezecenter_utils'
                      ],
       package_data = {
                       '':[ "*.gif", "*.png", "*.jpg" ],
                       },
-                     
       zip_safe=False
       )

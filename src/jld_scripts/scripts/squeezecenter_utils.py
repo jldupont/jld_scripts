@@ -41,7 +41,6 @@ def main():
         
         try:    
             import pysqueezecenter #@UnresolvedImport @UnusedImport
-            a
         except: 
             raise Exception("package 'pysqueezecenter' is required")
         
