@@ -34,6 +34,7 @@ from jld_scripts.system import mswitch #@UnusedImport
 mswitch.observe_mode=MSWITCH_OBSERVE_MODE
 mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
 
+from jld_scripts.agents.notifier import notify #@Reimport
 
 def main():
     try:
@@ -43,8 +44,6 @@ def main():
             a
         except: 
             raise Exception("package 'pysqueezecenter' is required")
-
-        
         
         from jld_scripts.res import get_res_path
         icon_path=get_res_path()
@@ -58,8 +57,7 @@ def main():
         gtk.main()
         
     except Exception,e:
-        from jld_scripts.agents.notifier import notify #@Reimport
         notify(APP_NAME, "There was an error: %s" % e)
-        mswitch.publish("__main__", "__quit__")
+        mswitch.quit()
         sys.exit(1)
 

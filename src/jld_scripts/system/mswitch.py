@@ -15,7 +15,7 @@
 from threading import Thread
 from Queue import Queue, Empty
 
-__all__=["publish", "subscribe", "observe_mode"]
+__all__=["publish", "subscribe", "quit", "observe_mode"]
 OBSERVE_FILTER_OUT=["__tick__", "log", "llog"]
 OBSERVE_FILTER_OUT_SOURCES=["__bridge__",]
 #OSBSERVE_FILTER_OUT=["log", "llog"]
@@ -112,7 +112,7 @@ class CentralSwitch(Thread):
                 except Empty:
                     break
         
-        print "mswitch - shutdown"
+        #print "mswitch - shutdown"
         
     def do_interest(self, args):
         """
@@ -194,6 +194,8 @@ def subscribe(orig, q, sq, _msgType=None):
     _switch.iq.put((orig, "__sub__", (q, sq)))
     
 
+def quit(orig="__main__"):
+    _switch.isq.put((orig, "__quit__", ([], {})), block=False)
 
 
 _switch=CentralSwitch()
