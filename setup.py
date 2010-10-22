@@ -5,7 +5,7 @@
     @author: Jean-Lou Dupont
 """
 __author__  ="Jean-Lou Dupont"
-__version__ ="0.6.2"
+__version__ ="0.7.0"
 
 from distutils.core import setup
 from setuptools import find_packages
@@ -20,5 +20,9 @@ setup(name=         'jld_scripts',
       packages=     find_packages("src"),
       scripts=      ['src/scripts/m3u2symlinks', 'src/scripts/id3info', 'src/scripts/lastfm_gettracks'
                      ],
+      package_data = {
+                      '':[ "*.gif", "*.png", "*.jpg" ],
+                      },
+                     
       zip_safe=False
       )

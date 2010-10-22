@@ -10,6 +10,8 @@ More information available [here](http://www.systemical.com/doc/opensource/jld_s
 History
 =======
 
+0.7.0: added 'squeezecenter_utils'
+
 0.6: added 'lastfm_gettracks'
 
 0.5.5: added "TLEN" and "TPE2" support for id3info
