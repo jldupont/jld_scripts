@@ -11,6 +11,8 @@ More information available [here](http://www.systemical.com/doc/opensource/jld_s
 History
 =======
 
+0.7.1: fixed string encoding issue in "m3u2symlinks"
+
 0.7.0: added 'squeezecenter_utils'
 
 0.6: added 'lastfm_gettracks'

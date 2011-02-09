@@ -129,7 +129,10 @@ def main():
         um.error(messages["m3u_readfailed"])
         sys.exit(1)
         
-    music, unknown, dups=_process(m3u.files)
+    music, unknown, dups=_process(m3u.files, verbose=options.verbose)
+    if music is None or unknown is None or dups is None:
+        return
+    
     
     #print "*** music: ", music
     #print "*** unknown: ", unknown
@@ -225,7 +228,7 @@ def _create_top_level_dirs(targetdir):
     safe_makedirs(d, ex=True)
 
         
-def _process(files):
+def _process(files, verbose=False):
     
     valid=[]
     unknown=[]
@@ -235,34 +238,49 @@ def _process(files):
     artists=[]
     
     ## Gather ID3 information
+    if verbose:
+        print "> Gathering ID3 information on %s files" % len(files)
+        
     for file in files:
         try:
             artist, album, title=get_id3_params(file)
             
-            ea=artist.encode("UTF-8").replace("/", "_").strip()
-            eb=album.encode("UTF-8").replace("/", "_").strip()
-            valid.append((file, (ea, eb, title.strip())))
+            ea=artist.encode("ascii", "ignore").replace("/", "_").strip()
+            eb=album.encode("ascii", "ignore").replace("/", "_").strip()
+            t=title.strip().encode("ascii", "ignore")
+            valid.append((file, (ea, eb, t)))
         except:
             unknown.append(file)
 
     ## Assign Link Name to valid entries
-    for entry in valid:
-        file, details=entry
-        artist, album, title=details
-        ln="%s-%s-%s.mp3" % (artist, album, title)
-        link_name=ln.encode("UTF-8").replace("/", "_")
-        list=music.get(link_name, [])
+    if verbose:
+        print "> Assigning name to valid entries"
+    try:
+        for entry in valid:
+            file, details=entry
+            artist, album, title=details
+            
+            ln="%s-%s-%s.mp3" % (artist.encode("ascii", "ignore"), album.encode("ascii", "ignore"), title.encode("ascii", "ignore"))
+            #ln=artist+"-"+album+"-"+title+".mp3"  ## doesn't work
+            #link_name=ln.decode("UTF-8").replace("/", "_")
+            link_name=ln.replace("/", "_")
+            list=music.get(link_name, [])
+            
+            ## we'll handle dups later
+            list.append((file, details))
+            music[link_name]=list
+            
+            ## collect artists to facilitate directory hierarchy creation
+            if artist not in artists:
+                ea=artist.encode("ascii", "ignore").replace("/", "_")
+                artists.append(ea)
+    except Exception,e:
+        print "! Exception whilst processing artist(%s) album(%s) title(%s)" % (artist, album, title.encode("ascii", "ignore"))
+        return None, None, None
         
-        ## we'll handle dups later
-        list.append((file, details))
-        music[link_name]=list
-        
-        ## collect artists to facilitate directory hierarchy creation
-        if artist not in artists:
-            ea=artist.encode("UTF-8").replace("/", "_")
-            artists.append(ea)
-        
-    ## Manage Dups
+    if verbose:
+        print "> Managing dup entries"
+
     for entry in music.iteritems():
         link_name, list=entry
         first=list[0]
