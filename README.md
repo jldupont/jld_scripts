@@ -7,9 +7,16 @@ Collection of python utility scripts
 
 More information available [here](http://www.systemical.com/doc/opensource/jld_scripts).
 
+Note
+=====
+
+When distributing using 'sdist' the MANIFEST.in is important in order to include resource files.
+
 
 History
 =======
+
+0.7.4: fixed missing *.gif files in the setup egg
 
 0.7.1: fixed string encoding issue in "m3u2symlinks"
 
