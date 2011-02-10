@@ -5,7 +5,7 @@
     @author: Jean-Lou Dupont
 """
 __author__  ="Jean-Lou Dupont"
-__version__ ="0.7.1"
+__version__ ="0.7.4"
 
 from distutils.core import setup
 from setuptools import find_packages
@@ -24,5 +24,6 @@ setup(name=         'jld_scripts',
       package_data = {
                       '':[ "*.gif", "*.png", "*.jpg" ],
                       },
+      include_package_data=True,                      
       zip_safe=False
       )

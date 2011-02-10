@@ -1,3 +1,4 @@
+MANIFEST.in
 setup.py
 src/jld_scripts/__init__.py
 src/jld_scripts.egg-info/PKG-INFO
@@ -18,6 +19,7 @@ src/jld_scripts/music/lastfm/__init__.py
 src/jld_scripts/music/lastfm/base.py
 src/jld_scripts/music/lastfm/parser_gettracks.py
 src/jld_scripts/res/__init__.py
+src/jld_scripts/res/squeezecenter.gif
 src/jld_scripts/scripts/__init__.py
 src/jld_scripts/scripts/id3info.py
 src/jld_scripts/scripts/lastfm_gettracks.py
