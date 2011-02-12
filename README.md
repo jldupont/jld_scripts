@@ -7,6 +7,12 @@ Collection of python utility scripts
 
 More information available [here](http://www.systemical.com/doc/opensource/jld_scripts).
 
+TODO
+====
+
+ * Auto-refresh Squeeze Box for squeezecenter_utils: when the server is restarte, the application looses synchronization with the server. 
+
+
 Note
 =====
 
