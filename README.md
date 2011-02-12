@@ -22,6 +22,8 @@ When distributing using 'sdist' the MANIFEST.in is important in order to include
 History
 =======
 
+0.7.5: squeezecenter_utils: now uses the most recent & first player discovered
+
 0.7.4: fixed missing *.gif files in the setup egg
 
 0.7.1: fixed string encoding issue in "m3u2symlinks"

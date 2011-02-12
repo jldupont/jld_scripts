@@ -23,14 +23,15 @@ class SqueezeAgent(AgentThreadedBase):
         
         self.sc = Server(hostname="127.0.0.1", port=9090)
         self.sc.connect()
-        players = self.sc.get_players()
-        self.player=players[0]
         
         
     def h_mk_key_press(self, key):
         """ 
         Direct access to the notification facility
         """
+        players = self.sc.get_players()
+        self.player=players[0]
+        
         dispatch_name="key_%s" % key.replace("-", "_")
         try:    getattr(self, dispatch_name)()
         except: pass
