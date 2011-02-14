@@ -21,15 +21,15 @@ class SqueezeAgent(AgentThreadedBase):
     def __init__(self):
         AgentThreadedBase.__init__(self)
         
-        self.sc = Server(hostname="127.0.0.1", port=9090)
-        self.sc.connect()
-        
         
     def h_mk_key_press(self, key):
         """ 
         Direct access to the notification facility
         """
-        players = self.sc.get_players()
+        sc = Server(hostname="127.0.0.1", port=9090)
+        sc.connect()
+                
+        players = sc.get_players()
         self.player=players[0]
         
         dispatch_name="key_%s" % key.replace("-", "_")

@@ -21,6 +21,7 @@ When distributing using 'sdist' the MANIFEST.in is important in order to include
 
 History
 =======
+0.7.6: better fix for squeezecenter_utils
 
 0.7.5: squeezecenter_utils: now uses the most recent & first player discovered
 
