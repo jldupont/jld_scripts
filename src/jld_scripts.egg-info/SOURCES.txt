@@ -7,6 +7,7 @@ src/jld_scripts.egg-info/dependency_links.txt
 src/jld_scripts.egg-info/not-zip-safe
 src/jld_scripts.egg-info/top_level.txt
 src/jld_scripts/agents/__init__.py
+src/jld_scripts/agents/clock.py
 src/jld_scripts/agents/mk_dbus.py
 src/jld_scripts/agents/notifier.py
 src/jld_scripts/agents/squeeze.py

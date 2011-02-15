@@ -11,6 +11,7 @@
     - "notify"
     - "logged"
     
+    14Feb2011: added "urgency" level
     
     @author: jldupont
     Created on Jun 28, 2010
@@ -25,10 +26,11 @@ from jld_scripts.system.base import AgentThreadedBase
 __all__=["NotifierAgent", "notify"]
 
 
-def notify(app_name, msg, icon_name="important"):
+def notify(app_name, msg, icon_name="important", urgency=pynotify.URGENCY_CRITICAL):
     try:
         pynotify.init(app_name)
         n=pynotify.Notification(app_name, msg, icon_name)
+        n.set_urgency(urgency)
         n.show()
         return n
     except:
@@ -36,6 +38,11 @@ def notify(app_name, msg, icon_name="important"):
 
 
 class NotifierAgent(AgentThreadedBase):
+    
+    UMAP = { "normal":  pynotify.URGENCY_NORMAL
+            ,"low":     pynotify.URGENCY_LOW
+            ,"high":    pynotify.URGENCY_CRITICAL
+            }
     
     def __init__(self, app_name, icon_name):
         AgentThreadedBase.__init__(self)
@@ -45,11 +52,13 @@ class NotifierAgent(AgentThreadedBase):
 
         self.types=["w", "e", "warning", "error"]
         
-    def h_notify(self, msg):
+    def h_notify(self, msg, urgency=None):
         '''
         Direct access to the notification facility
         '''
         n=pynotify.Notification(self.app_name, msg, self.icon_name)
+        if urgency is not None:
+            n.set_urgency(self.UMAP.get(urgency, pynotify.URGENCY_NORMAL))
         n.show()
         
         

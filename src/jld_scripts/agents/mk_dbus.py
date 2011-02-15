@@ -8,7 +8,6 @@
     @author: jldupont
 """
 import dbus.service
-print dbus.__file__
     
 from jld_scripts.system.base import AgentThreadedBase
 from jld_scripts.system import mswitch
@@ -39,6 +38,18 @@ class MKSignalRx(dbus.service.Object):
                 mswitch.publish(self.agent, "mk_key_press", p[1])
 
 
+class TrackSignalTx(dbus.service.Object):
+
+    PATH="/Track"
+    
+    def __init__(self, agent):
+        dbus.service.Object.__init__(self, dbus.SessionBus(), self.PATH)
+        self.agent=agent
+        
+    @dbus.service.signal(dbus_interface="com.jldupont.squeezecenter", signature="ssss")
+    def Track(self, artist, album, title, path):
+        pass
+
 
 class DbusAgent(AgentThreadedBase):
     
@@ -46,6 +57,10 @@ class DbusAgent(AgentThreadedBase):
         AgentThreadedBase.__init__(self)
 
         self.srx=MKSignalRx(self)
+        self.stx=TrackSignalTx(self)
+        
+    def h_track(self, artist, album, title, path):
+        self.stx.Track(artist, album, title, path)
                    
 _=DbusAgent()
 _.start()

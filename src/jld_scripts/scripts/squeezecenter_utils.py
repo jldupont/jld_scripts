@@ -1,6 +1,8 @@
 """
     squeezecenter_utils
         
+    14 Feb 2011: added "playing now" dbus signal
+        
     Created on 2010-10-21
     @author: jldupont
 """
@@ -9,6 +11,7 @@ import sys
 APP_NAME="SqueezeCenter Utils"
 ICON_NAME="squeezecenter.gif"
 HELP_URL="http://www.systemical.com/doc/opensource/squeezecenter_utils"
+TIME_BASE=5000
 
 ###<<< DEVELOPMENT MODE SWITCHES
 MSWITCH_OBSERVE_MODE=False
@@ -34,7 +37,8 @@ from jld_scripts.system import mswitch #@UnusedImport
 mswitch.observe_mode=MSWITCH_OBSERVE_MODE
 mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
 
-from jld_scripts.agents.notifier import notify #@Reimport
+from jld_scripts.agents.notifier import notify, NotifierAgent #@Reimport
+from jld_scripts.agents.clock import Clock #@Reimport
 
 def main():
     try:
@@ -52,6 +56,12 @@ def main():
 
         import jld_scripts.agents.mk_dbus #@UnusedImport
         import jld_scripts.agents.squeeze #@UnusedImport
+        
+        _na=NotifierAgent(APP_NAME, ICON_NAME)
+        _na.start()
+        
+        clk=Clock(TIME_BASE)
+        gobject.timeout_add(TIME_BASE, clk.tick)
         
         gtk.main()
         
