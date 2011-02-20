@@ -19,6 +19,20 @@ from pysqueezecenter.player import Player
 __all__=["SqueezeAgent"]
 
 class SqueezeAgent(AgentThreadedBase):
+
+    MAP={
+            "mute":             "key_mute"
+            ,"stop_cd":         "key_stop"
+            ,"stop":            "key_stop"
+            ,"next_song":       "key_next"
+            ,"next":            "key_next"
+            ,"previous_song":   "key_previous"
+            ,"previous":        "key_previous"
+            ,"play_pause":      "key_play"
+            ,"play":            "key_play"
+            ,"volume_up":       "key_volume_up"
+            ,"volume_down":     "key_volume_down"
+         }
     
     def __init__(self):
         AgentThreadedBase.__init__(self)
@@ -71,27 +85,29 @@ class SqueezeAgent(AgentThreadedBase):
         ## we tried...
         if self.player is None:
             return
-
-        dispatch_name="key_%s" % key.replace("-", "_")
+        
+        #dispatch_name="key_%s" % key.replace("-", "_")
+        dispatch_name=self.MAP.get(key, "not_found")
         try:    getattr(self, dispatch_name)()
-        except: pass
+        except:
+            print "* not found: %s" % key
         
     def key_mute(self):
         self.player.set_muting( not self.player.get_muting() )
         
-    def key_stop_cd(self):
+    def key_stop(self):
         self.player.stop()
         self.announce()
         
-    def key_next_song(self):
+    def key_next(self):
         self.player.next()
         self.announce()
         
-    def key_previous_song(self):
+    def key_previous(self):
         self.player.prev()
         self.announce()
         
-    def key_play_pause(self):
+    def key_play(self):
         self.player.toggle()
         
     def key_volume_up(self):

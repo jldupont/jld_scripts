@@ -32,6 +32,9 @@ When distributing using 'sdist' the MANIFEST.in is important in order to include
 
 History
 =======
+0.8.1
+	* fixed for latest updates of Ubuntu 10.10 (still can't find solution for volume up/down)
+
 0.8.0: 
 	* added Dbus signal for current track on SqueezeCenter
 	* added notify bubble with current track on SqueezeCenter
