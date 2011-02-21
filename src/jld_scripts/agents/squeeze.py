@@ -22,16 +22,16 @@ class SqueezeAgent(AgentThreadedBase):
 
     MAP={
             "mute":             "key_mute"
-            ,"stop_cd":         "key_stop"
+            ,"stop-cd":         "key_stop"
             ,"stop":            "key_stop"
-            ,"next_song":       "key_next"
+            ,"next-song":       "key_next"
             ,"next":            "key_next"
-            ,"previous_song":   "key_previous"
+            ,"previous-song":   "key_previous"
             ,"previous":        "key_previous"
-            ,"play_pause":      "key_play"
+            ,"play-pause":      "key_play"
             ,"play":            "key_play"
-            ,"volume_up":       "key_volume_up"
-            ,"volume_down":     "key_volume_down"
+            ,"volume-up":       "key_volume_up"
+            ,"volume-down":     "key_volume_down"
          }
     
     def __init__(self):
@@ -40,6 +40,8 @@ class SqueezeAgent(AgentThreadedBase):
         self.cAlbum=""
         self.cTitle=""
         self._reconnect()
+        self.current_source=(None, None)
+        self.ignore=[]
         
     def h___tick__(self, *_):
         if self.player is None:
@@ -75,7 +77,7 @@ class SqueezeAgent(AgentThreadedBase):
             self.player=None
 
         
-    def h_mk_key_press(self, key):
+    def h_mk_key_press(self, key, source, priority):
         """ 
         Direct access to the notification facility
         """
@@ -85,6 +87,19 @@ class SqueezeAgent(AgentThreadedBase):
         ## we tried...
         if self.player is None:
             return
+        
+        if (source in self.ignore):
+            return
+        
+        name, prio=self.current_source
+        if name is not None:
+            if (priority < prio):
+                self.ignore.append(source)
+                #print "* ignoring source: %s" % source
+                return
+        self.current_source=(source, priority)
+            
+        #print "> source: %s key: %s" % (source, key)
         
         #dispatch_name="key_%s" % key.replace("-", "_")
         dispatch_name=self.MAP.get(key, "not_found")

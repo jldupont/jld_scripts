@@ -2,7 +2,8 @@
     MediaKeys Dbus Agent
     
     Messages Generated:
-    - "mk_key_press"
+    - "mk_key_press" (key, source, priority)
+        priority: 1 -> low, 5 -> high
     
     Created on 2010-10-22
     @author: jldupont
@@ -36,7 +37,7 @@ class MKSignalRx1(dbus.service.Object):
         """
         if len(p) == 2:
             if (p[0]=="ButtonPressed"):
-                mswitch.publish(self.agent, "mk_key_press", p[1])
+                mswitch.publish(self.agent, "mk_key_press", p[1], "source1", 5)
 
 class MKSignalRx2(dbus.service.Object):
     """ works on ubuntu >= 10.10
@@ -58,7 +59,7 @@ class MKSignalRx2(dbus.service.Object):
         DBus signal handler
         """
         if len(p) == 2:
-            mswitch.publish(self.agent, "mk_key_press", p[1].lower())
+            mswitch.publish(self.agent, "mk_key_press", p[1].lower(), "source2", 1)
 
 
 class TrackSignalTx(dbus.service.Object):
