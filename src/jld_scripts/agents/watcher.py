@@ -10,6 +10,9 @@
     
     * a "moved" message with a "src=None" signifies that a file/dir was moved to the target path
     * a "moved" message with "src!=None" signifies that a file/dir changed name
+    
+    
+    
 """
 import os
 import pyinotify
@@ -23,7 +26,7 @@ __all__=[]
 class EventHandler(pyinotify.ProcessEvent):
 
     def process_IN_CLOSE_WRITE(self, event):
-        self._handle("modified", event)        
+        self._handle("modified_closed", event)        
         #print "Close Write:", event.pathname
     
     def process_IN_CREATE(self, event):
@@ -103,6 +106,12 @@ class WatcherAgent(AgentThreadedBase):
         
     def beforeQuit(self):
         self.notifier.stop()
+
+    def h_modified_closed(self, path, symlink, *_):
+        print "! modified_closed (%s) symlink(%s)" % (path, symlink)
+
+    def h_modified(self, path, symlink, *_):
+        print "! modified (%s) symlink(%s)" % (path, symlink)
         
     def h_created(self, path, symlink, *_):
         print "! created (%s) symlink(%s)" % (path, symlink)

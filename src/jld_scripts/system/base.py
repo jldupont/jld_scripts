@@ -122,6 +122,8 @@ def process_queues(halting, src_agent, agent_name, agent_id, interest_map, respo
                 burst -= 1
                 if burst == 0:
                     break
+            except KeyboardInterrupt:
+                raise
             except Empty:
                 break
     
@@ -429,6 +431,8 @@ def custom_dispatch(source, q, pq, dispatcher, low_priority_burst_size=5):
                 print "* '%s': not interest in '%s' message type" % (orig, mtype)
                 mswitch.publish(source, "__interest__", source, mtype, False, snooping, q, pq)
                 break
+        except KeyboardInterrupt:
+            raise            
         except Empty:
             break
         continue            
@@ -452,6 +456,8 @@ def custom_dispatch(source, q, pq, dispatcher, low_priority_burst_size=5):
             burst -= 1
             if burst == 0:
                 break
+        except KeyboardInterrupt:
+            raise            
         except Empty:
             break
         
@@ -477,6 +483,8 @@ def dispatcher(source, q, pq, low_priority_burst_size=5):
                 print "* '%s': not interest in '%s' message type" % (orig, mtype)
                 mswitch.publish(source, "__interest__", source, mtype, False, snooping, pq)
                 break
+        except KeyboardInterrupt:
+            raise            
         except Empty:
             break
         continue            
@@ -500,6 +508,8 @@ def dispatcher(source, q, pq, low_priority_burst_size=5):
             burst -= 1
             if burst == 0:
                 break
+        except KeyboardInterrupt:
+            raise            
         except Empty:
             break
         
