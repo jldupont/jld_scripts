@@ -63,6 +63,11 @@ def main():
         
         gtk.main()
         
+    except KeyboardInterrupt:
+        mswitch.quit()
+        try:    gtk.main_quit()
+        except: pass
+        
     except Exception,e:
         notify(APP_NAME, "There was an error: %s" % e)
         mswitch.quit()
