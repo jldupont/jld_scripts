@@ -250,6 +250,9 @@ class AgentThreadedBase(Thread):
     def beforeRun(self):
         pass
         
+    def beforeQuit(self):
+        pass
+        
     def doQuit(self):
         self.quit=True
         
@@ -273,6 +276,8 @@ class AgentThreadedBase(Thread):
             quit=process_queues(self.halting, self, self.agent_name, self.id, 
                                 self.mmap, self.responsesInterest,
                                 self.iq, self.isq, message_processor)
+        
+        self.beforeQuit()
         
         ##self._pub("__agent__", self.agent_name, self.id, "stop")    
         print "Agent(%s) (%s) ending" % (self.agent_name, self.id)
