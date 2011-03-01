@@ -11,7 +11,12 @@
     * a "moved" message with a "src=None" signifies that a file/dir was moved to the target path
     * a "moved" message with "src!=None" signifies that a file/dir changed name
     
-    
+    Messages Out:
+    * "removed" : (not reliable at the moment - do not use)
+    * "deleted"
+    * "created"
+    * "moved"   : can be generated as a result of "rename" - beware as the path might not be available anymore soon
+    * "renamed" : when a path is renamed from 'src' to 'path'
     
 """
 import os
@@ -79,9 +84,16 @@ class EventHandler(pyinotify.ProcessEvent):
         ## filter-out the "moved" that are actually
         ##  name changes where the event was the "from" notification alone
         if msg_type=="moved":
-            src_exists=os.path.exists(path)
-            if src_exists:
-                mswitch_publish("watcher", msg_type, path, symlink_path, src)
+            if src is not None:
+                src_exists=os.path.exists(path)
+                if src_exists:
+                    mswitch_publish("watcher", "renamed", path, symlink_path, src)
+                    return
+                else:
+                    mswitch_publish("watcher", "removed", path, symlink_path)
+                    return                    
+                        
+            mswitch_publish("watcher", "moved", path, symlink_path)
             return
             
         mswitch_publish("watcher", msg_type, path, symlink_path, src)
@@ -99,10 +111,10 @@ class WatcherAgent(AgentThreadedBase):
         self.wait_count=None
         
         self.wm = pyinotify.WatchManager()
-        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_MOVED_FROM
+        self.mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_MOVED_FROM
         self.notifier = pyinotify.Notifier(self.wm, default_proc_fun=EventHandler(), timeout=1000)
         
-        self.wdd = self.wm.add_watch(self.watched_dir, mask, rec=True, auto_add=True, do_glob=True)
+        self._addDir(self.watched_dir)
         
     def beforeQuit(self):
         self.notifier.stop()
@@ -119,10 +131,36 @@ class WatcherAgent(AgentThreadedBase):
     def h_deleted(self, path, symlink, *_):
         print "! deleted (%s) symlink(%s)" % (path, symlink)
 
-    def h_moved(self, path, symlink, src):
+    def h_moved(self, path, symlink):
         #print "! moved (%s) symlink(%s) src(%s) cookie(%s)" % (path, symlink, src, cookie)
-        print "! moved (%s) symlink(%s) src(%s)" % (path, symlink, src)
+        print "! moved (%s) symlink(%s)" % (path, symlink)
 
+    def h_renamed(self, path, symlink, src):
+        #print "! moved (%s) symlink(%s) src(%s) cookie(%s)" % (path, symlink, src, cookie)
+        print "! renamed (%s) symlink(%s) src(%s)" % (path, symlink, src)
+
+    def h_removed(self, path, symlink):
+        #print "! moved (%s) symlink(%s) src(%s) cookie(%s)" % (path, symlink, src, cookie)
+        print "! removed (%s) symlink(%s) src(%s)" % (path, symlink, src)
+
+
+    def _addSymlinkDir(self, path):
+        """
+        Handles the addition of a symlinked directory
+        """
+
+
+    def _addDir(self, path):
+        """
+        Returns 'wd' watch descriptor
+        """
+        return self.wm.add_watch(self.watched_dir, self.mask, rec=True, auto_add=True)
+        
+    def _rmDir(self, wd):
+        """
+        Returns 'wd' dictionary
+        """
+        return self.wm.rm_watch(wd, rec=True, quiet=True)
         
     def h___tick__(self, *_):
         """
