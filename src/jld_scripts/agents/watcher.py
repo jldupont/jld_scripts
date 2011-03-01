@@ -4,6 +4,12 @@
     Created on 2011-02-28
 
     @author: jldupont
+    
+    NOTES:
+    ------
+    
+    * a "moved" message with a "src=None" signifies that a file/dir was moved to the target path
+    * a "moved" message with "src!=None" signifies that a file/dir changed name
 """
 import os
 import pyinotify
@@ -66,6 +72,15 @@ class EventHandler(pyinotify.ProcessEvent):
         src=event.__dict__.get("src_pathname", None) if msg_type=="moved" else None
         symlink=os.path.islink(path)
         symlink_path=os.readlink(path) if symlink else None
+        
+        ## filter-out the "moved" that are actually
+        ##  name changes where the event was the "from" notification alone
+        if msg_type=="moved":
+            src_exists=os.path.exists(path)
+            if src_exists:
+                mswitch_publish("watcher", msg_type, path, symlink_path, src)
+            return
+            
         mswitch_publish("watcher", msg_type, path, symlink_path, src)
 
 
@@ -81,7 +96,7 @@ class WatcherAgent(AgentThreadedBase):
         self.wait_count=None
         
         self.wm = pyinotify.WatchManager()
-        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_CLOSE_WRITE #| pyinotify.ALL_EVENTS # | pyinotify.IN_MOVED_TO
+        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_MOVED_FROM
         self.notifier = pyinotify.Notifier(self.wm, default_proc_fun=EventHandler(), timeout=1000)
         
         self.wdd = self.wm.add_watch(self.watched_dir, mask, rec=True, auto_add=True, do_glob=True)
@@ -96,6 +111,7 @@ class WatcherAgent(AgentThreadedBase):
         print "! deleted (%s) symlink(%s)" % (path, symlink)
 
     def h_moved(self, path, symlink, src):
+        #print "! moved (%s) symlink(%s) src(%s) cookie(%s)" % (path, symlink, src, cookie)
         print "! moved (%s) symlink(%s) src(%s)" % (path, symlink, src)
 
         
