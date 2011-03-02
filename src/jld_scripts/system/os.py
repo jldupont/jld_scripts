@@ -23,6 +23,10 @@ def mounts():
     return result
 
 def lookup_mount(path, trylowercase=False):
+    """
+    Lookup a mount record for the specified path
+    @returns: None or [mount ...] 
+    """
     _mounts=mounts()
     for mount in _mounts:
         if mount[0]==path:

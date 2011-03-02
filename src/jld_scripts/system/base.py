@@ -18,6 +18,7 @@
     @revised: August 22, 2010 :  filtered-out "send to self" case
     @revised: August 23, 2010 :  added "snooping mode", remove another message loop, tidied-up
     @revised: January 10, 2011:  added 'logging' facility helper  
+    @revised: March 1, 2011:  added "beforeQuit", added "KeyboardInterrupt" handling
 """
 
 from threading import Thread
@@ -250,9 +251,15 @@ class AgentThreadedBase(Thread):
             self.credits[logLevel]=self.credits.get(logLevel, start_credits)-1
         
     def beforeRun(self):
+        """
+        Executed before starting the agent's thread
+        """
         pass
         
     def beforeQuit(self):
+        """
+        Executed just before finishing the agent's thread
+        """
         pass
         
     def doQuit(self):
