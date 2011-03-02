@@ -15,7 +15,8 @@
     * "removed" : (not reliable at the moment - do not use)
     * "deleted"
     * "created"
-    * "moved"   : can be generated as a result of "rename" - beware as the path might not be available anymore soon
+    * "moved"   : 1) can be generated as a result of "rename" - beware as the path might not be available anymore soon
+                  2) furthermore, when a directory is "moved out" of the "watched dir", no event is generated...  
     * "renamed" : when a path is renamed from 'src' to 'path'
     
 """
@@ -110,6 +111,8 @@ class WatcherAgent(AgentThreadedBase):
         self._createWatchedDir()
         self.wait_count=None
         
+        self.lmoved=[]
+        
         self.wm = pyinotify.WatchManager()
         self.mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_MOVED_FROM
         self.notifier = pyinotify.Notifier(self.wm, default_proc_fun=EventHandler(), timeout=1000)
@@ -119,6 +122,7 @@ class WatcherAgent(AgentThreadedBase):
     def beforeQuit(self):
         self.notifier.stop()
 
+### ======================================================================================================
     def h_modified_closed(self, path, symlink, *_):
         print "! modified_closed (%s) symlink(%s)" % (path, symlink)
 
@@ -141,8 +145,9 @@ class WatcherAgent(AgentThreadedBase):
 
     def h_removed(self, path, symlink):
         #print "! moved (%s) symlink(%s) src(%s) cookie(%s)" % (path, symlink, src, cookie)
-        print "! removed (%s) symlink(%s) src(%s)" % (path, symlink, src)
+        print "! removed (%s) symlink(%s)" % (path, symlink)
 
+### ======================================================================================================
 
     def _addSymlinkDir(self, path):
         """
