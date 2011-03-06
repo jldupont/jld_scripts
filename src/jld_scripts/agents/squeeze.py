@@ -42,6 +42,8 @@ class SqueezeAgent(AgentThreadedBase):
         self._reconnect()
         self.current_source=(None, None)
         self.ignore=[]
+        self.mode_sound_only=False
+        self.debug=False
         
     def h___tick__(self, *_):
         if self.player is None:
@@ -111,25 +113,41 @@ class SqueezeAgent(AgentThreadedBase):
         self.player.set_muting( not self.player.get_muting() )
         
     def key_stop(self):
-        self.player.stop()
-        self.announce()
+        if not self.mode_sound_only:
+            self.player.stop()
+            self.announce()
         
     def key_next(self):
-        self.player.next()
-        self.announce()
+        if not self.mode_sound_only:
+            self.player.next()
+            self.announce()
         
     def key_previous(self):
-        self.player.prev()
-        self.announce()
+        if not self.mode_sound_only:
+            self.player.prev()
+            self.announce()
         
     def key_play(self):
-        self.player.toggle()
+        if not self.mode_sound_only:
+            self.player.toggle()
         
     def key_volume_up(self):
         self.player.volume_up()
 
     def key_volume_down(self):
         self.player.volume_down()
+        
+    def h_mode_sound_only(self, state):
+        """  Mode 'Sound only' control
+        """ 
+        self.mode_sound_only=state
+        if self.debug:
+            print "* Mode Sound Only: %s" % state
+
+    def h_debug(self, state):
+        #print "Debug mode: %s" % state
+        self.debug=state
+        
         
 ## Usage           
 _=SqueezeAgent()

@@ -7,9 +7,9 @@
     @author: jldupont
 """
 import gtk
-from Queue import Queue, Empty
-from app.system import mswitch
-from app.system.base import process_queues, message_processor
+from Queue import Queue
+from jld_scripts.system import mswitch
+from jld_scripts.system.base import process_queues, message_processor
 
 __all__=["UiAgentBase"]
 

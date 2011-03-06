@@ -6,11 +6,15 @@
 import os
 import sys
 
+DEBUG=False
+
 if "JLD_SCRIPTS" in os.environ:
+	print ">> Debug mode entered"
+	DEBUG=True
 	this_dir=os.path.dirname(__file__)
 	lib_path=os.path.abspath(os.path.join(this_dir, ".."))
 	sys.path.insert(0, lib_path)
 
 from jld_scripts.scripts.squeezecenter_utils import main
 
-main()
+main(DEBUG)

@@ -109,6 +109,8 @@ def process_queues(halting, src_agent, agent_name, agent_id, interest_map, respo
             if quit:
                 quit=True
                 break
+        except KeyboardInterrupt:
+            raise            
         except Empty:
             break
 

@@ -40,7 +40,7 @@ mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
 from jld_scripts.agents.notifier import notify, NotifierAgent #@Reimport
 from jld_scripts.agents.clock import Clock #@Reimport
 
-def main():
+def main(debug=False):
     try:
         
         try:    
@@ -51,7 +51,7 @@ def main():
         from jld_scripts.res import get_res_path
         icon_path=get_res_path()
         
-        from jld_scripts.agents.tray import TrayAgent
+        from jld_scripts.agents.squeeze_tray import TrayAgent
         _ta=TrayAgent(APP_NAME, icon_path, ICON_NAME, HELP_URL)
 
         import jld_scripts.agents.mk_dbus #@UnusedImport
@@ -63,7 +63,12 @@ def main():
         clk=Clock(TIME_BASE)
         gobject.timeout_add(TIME_BASE, clk.tick)
         
+        mswitch.publish("__main__", "debug", debug)
+        
         gtk.main()
+    except KeyboardInterrupt:
+        mswitch.quit()
+        sys.exit(1)        
         
     except Exception,e:
         notify(APP_NAME, "There was an error: %s" % e)

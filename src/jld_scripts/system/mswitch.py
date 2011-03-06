@@ -82,6 +82,8 @@ class CentralSwitch(Thread):
                     ## high priority messages are processed until
                     ## exhaustion
                     continue
+                except KeyboardInterrupt:
+                    raise
                 except Empty:
                     break
     
@@ -109,6 +111,8 @@ class CentralSwitch(Thread):
                     burst -= 1
                     if burst==0:
                         break
+                except KeyboardInterrupt:
+                    raise                    
                 except Empty:
                     break
         
