@@ -175,6 +175,10 @@ class SqueezeAgent(AgentThreadedBase):
             
             This is a JSON message
         """
+        if self.mode_disable_eventor:
+            self._debug("*** Eventor interface disabled.")
+            return
+        
         try:
             info=json.loads(msg)
         except:
