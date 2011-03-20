@@ -61,6 +61,29 @@ class MKSignalRx2(dbus.service.Object):
         if len(p) == 2:
             mswitch.publish(self.agent, "mk_key_press", p[1].lower(), "source2", 1)
 
+class MKSignalRx3(dbus.service.Object):
+    """ Eventor interface
+    """
+    PATH="/Events"
+    
+    def __init__(self, agent):
+        dbus.service.Object.__init__(self, dbus.SystemBus(), self.PATH) ## not sure we need this just to receive signals...
+        self.agent=agent
+        
+        dbus.SystemBus().add_signal_receiver(self.sMsg,
+                                       signal_name="Msg",
+                                       dbus_interface="com.systemical.eventor",
+                                       bus_name=None,
+                                       path="/Events"
+                                       )            
+    def sMsg(self, *p):
+        """
+        DBus signal handler
+        """
+        print "*** Eventor: %s" % p
+        if len(p) == 1:
+            mswitch.publish(self.agent, "eventor_msg", p[0])
+
 
 class TrackSignalTx(dbus.service.Object):
 
@@ -82,6 +105,7 @@ class DbusAgent(AgentThreadedBase):
 
         self.srx1=MKSignalRx1(self)
         self.srx2=MKSignalRx2(self)
+        self.srx3=MKSignalRx3(self)
         
         self.stx=TrackSignalTx(self)
         

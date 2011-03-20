@@ -11,6 +11,7 @@
     
     TODO add notification when Player is not found?
 """
+import json
 from jld_scripts.system.base import AgentThreadedBase
 
 from pysqueezecenter.server import Server
@@ -44,6 +45,7 @@ class SqueezeAgent(AgentThreadedBase):
         self.ignore=[]
         self.mode_sound_only=False
         self.debug=False
+        self.mode_disable_eventor=False
         
     def h___tick__(self, *_):
         if self.player is None:
@@ -109,13 +111,16 @@ class SqueezeAgent(AgentThreadedBase):
         except:
             print "* not found: %s" % key
         
+    def _doStop(self):
+        self.player.stop()
+        self.announce()
+        
     def key_mute(self):
         self.player.set_muting( not self.player.get_muting() )
         
     def key_stop(self):
         if not self.mode_sound_only:
-            self.player.stop()
-            self.announce()
+            self._doStop()
         
     def key_next(self):
         if not self.mode_sound_only:
@@ -141,13 +146,44 @@ class SqueezeAgent(AgentThreadedBase):
         """  Mode 'Sound only' control
         """ 
         self.mode_sound_only=state
+        self._debug("* Mode Sound Only: %s" % state)
+
+    def _debug(self, msg):
         if self.debug:
-            print "* Mode Sound Only: %s" % state
+            print msg
+        
+
+    def h_mode_disable_eventor(self, state):
+        self.mode_disable_eventor=state
 
     def h_debug(self, state):
         #print "Debug mode: %s" % state
         self.debug=state
         
+    def h_eventor_msg(self, msg):
+        """ From Eventor
+            
+            This is a JSON message
+        """
+        try:
+            info=json.loads(msg)
+        except:
+            info=None
+            
+        if info is None:
+            self._debug("! received unsupported Eventor msg: "+msg)
+            return
+        
+        state=info.get("state", None)
+        type=info.get("type", None)
+        if type is None or state is None:
+            self._debug("! can't find 'type'/'state' field(s) in: "+info)
+            return
+        
+        if type.lower()=="incomingcall":
+            if state.lower()=="ringing":
+                self._doStop()
+                self._debug("*** stopped because of Incoming Call.")
         
 ## Usage           
 _=SqueezeAgent()

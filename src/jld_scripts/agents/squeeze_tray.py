@@ -14,17 +14,20 @@ import jld_scripts.system.mswitch as mswitch
 
 class AppPopupMenu:
     def __init__(self, app):
+        self.item_disable_eventor = gtk.CheckMenuItem( "Disable Eventor input control", True)
         self.item_sound_only = gtk.CheckMenuItem( "Sound Control Only", True)
         self.item_exit = gtk.MenuItem( "exit", True)
         self.item_show = gtk.MenuItem( "show", True)
         self.item_help = gtk.MenuItem( "help", True)
 
+        self.item_disable_eventor.connect('activate', app.disable_eventor)
         self.item_sound_only.connect( 'activate', app.sound_only)
         self.item_show.connect( 'activate', app.show)
         self.item_help.connect( 'activate', app.help)
         self.item_exit.connect( 'activate', app.exit)
         
         self.menu = gtk.Menu()
+        self.menu.append( self.item_disable_eventor )
         self.menu.append( self.item_sound_only )
         self.menu.append( self.item_show )
         self.menu.append( self.item_help )
@@ -70,7 +73,11 @@ class TrayAgent(object):
         
         scaled_buf = AppIcon(icon_path, icon_file).getIconPixBuf()
         self.tray.set_from_pixbuf( scaled_buf )
-        
+    
+    def disable_eventor(self, widget):
+        state=widget.active
+        mswitch.publish(self, "mode_disable_eventor", state)
+    
     def sound_only(self, widget):
         state=widget.active
         mswitch.publish(self, "mode_sound_only", state)
