@@ -32,6 +32,9 @@ When distributing using 'sdist' the MANIFEST.in is important in order to include
 
 History
 =======
+
+0.8.3: added "Eventor" DBus interface support
+
 0.8.1
 	* fixed for latest updates of Ubuntu 10.10 (still can't find proper solution for volume up/down)
 
