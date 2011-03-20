@@ -115,6 +115,16 @@ class SqueezeAgent(AgentThreadedBase):
         self.player.stop()
         self.announce()
         
+    def _doPause(self):
+        try:    mode=self.player.get_mode().lower()
+        except: mode=""
+        
+        if mode=="play":
+            self.player.pause()
+            return True
+        return False
+            
+        
     def key_mute(self):
         self.player.set_muting( not self.player.get_muting() )
         
@@ -182,8 +192,8 @@ class SqueezeAgent(AgentThreadedBase):
         
         if type.lower()=="incomingcall":
             if state.lower()=="ringing":
-                self._doStop()
-                self._debug("*** stopped because of Incoming Call.")
+                if self._doPause():
+                    self._debug("*** paused because of Incoming Call.")
         
 ## Usage           
 _=SqueezeAgent()

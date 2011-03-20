@@ -80,7 +80,7 @@ class MKSignalRx3(dbus.service.Object):
         """
         DBus signal handler
         """
-        print "*** Eventor: %s" % p
+        #print "*** Eventor: %s" % p
         if len(p) == 1:
             mswitch.publish(self.agent, "eventor_msg", p[0])
 
