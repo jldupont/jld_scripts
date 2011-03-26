@@ -12,4 +12,9 @@ if "JLD_SCRIPTS" in os.environ:
 
 from jld_scripts.scripts.id3info import main
 
-main()
+try:
+	main()
+except KeyboardInterrupt:
+	print "Exiting..."
+	sys.exit(1)
+
