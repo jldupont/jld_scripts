@@ -13,4 +13,9 @@ if "JLD_SCRIPTS" in os.environ:
 	
 from jld_scripts.scripts.lastfm_gettracks import main
 
-main()
+try:
+	main()
+except KeyboardInterrupt:
+	print "\nExiting..."
+	sys.exit(1)
+

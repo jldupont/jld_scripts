@@ -17,4 +17,8 @@ if "JLD_SCRIPTS" in os.environ:
 
 from jld_scripts.scripts.squeezecenter_utils import main
 
-main(DEBUG)
+try:
+	main(DEBUG)
+except KeyboardInterrupt:
+	print "\nExiting..."
+	sys.exit(1)

@@ -15,6 +15,6 @@ from jld_scripts.scripts.id3info import main
 try:
 	main()
 except KeyboardInterrupt:
-	print "Exiting..."
+	print "\nExiting..."
 	sys.exit(1)
 
