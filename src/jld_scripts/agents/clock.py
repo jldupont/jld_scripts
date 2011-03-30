@@ -5,6 +5,7 @@
 
     @author: jldupont
 '''
+import gobject
 from Queue import Queue
 from jld_scripts.system import mswitch
 from jld_scripts.system.base import process_queues, message_processor
@@ -13,9 +14,10 @@ __all__=["Clock"]
 
 class Clock(object):
     
+    DEFAULT_TIME_BASE=1000
     LOW_PRIORITY_MESSAGE_BURST_SIZE=5
     
-    def __init__(self, time_base):
+    def __init__(self, time_base=DEFAULT_TIME_BASE):
         """
         @param time_base: in milliseconds
         """
@@ -34,6 +36,9 @@ class Clock(object):
 
         self.interests={}
         self.responsesInterests=[]
+
+    def init(self):
+        gobject.timeout_add(self.time_base, self.tick)
 
     def pub(self, msgType, *pargs, **kargs):
         mswitch.publish("__main__", msgType, *pargs, **kargs)
@@ -77,3 +82,4 @@ class Clock(object):
                        )
         ## for gobject... just in case
         return True
+

@@ -8,7 +8,7 @@
 """
 import sys
 
-APP_VERSION="1.0"
+APP_VERSION="1.1"
 APP_NAME="SqueezeCenter Utils"
 ICON_NAME="squeezecenter.gif"
 HELP_URL="http://www.systemical.com/doc/opensource/squeezecenter_utils"
@@ -21,15 +21,7 @@ MSWITCH_DEBUG_INTEREST=False
 DEV_MODE=True
 ###>>>
 
-import gobject
-import dbus.glib
-from dbus.mainloop.glib import DBusGMainLoop
-import gtk
-
-gobject.threads_init()  #@UndefinedVariable
-dbus.glib.init_threads()
-DBusGMainLoop(set_as_default=True)
-
+import jld_scripts.system.setup #@UnusedImport
 from jld_scripts.system import base as base
 base.debug=DEV_MODE
 base.debug_interest=MSWITCH_DEBUG_INTEREST
@@ -37,9 +29,6 @@ base.debug_interest=MSWITCH_DEBUG_INTEREST
 from jld_scripts.system import mswitch #@UnusedImport
 mswitch.observe_mode=MSWITCH_OBSERVE_MODE
 mswitch.debugging_mode=MSWITCH_DEBUGGING_MODE
-
-from jld_scripts.agents.notifier import notify, NotifierAgent #@Reimport
-from jld_scripts.agents.clock import Clock #@Reimport
 
 def main(debug=False):
     try:
@@ -58,15 +47,19 @@ def main(debug=False):
         import jld_scripts.agents.mk_dbus #@UnusedImport
         import jld_scripts.agents.squeeze #@UnusedImport
         
+        from jld_scripts.agents.notifier import notify, NotifierAgent #@Reimport
         _na=NotifierAgent(APP_NAME, ICON_NAME)
         _na.start()
-        
-        clk=Clock(TIME_BASE)
-        gobject.timeout_add(TIME_BASE, clk.tick)
+
+        from jld_scripts.agents.clock import Clock #@Reimport        
+        _clk=Clock(TIME_BASE)
+        _clk.init()
         
         mswitch.publish("__main__", "debug", debug)
         
+        import gtk
         gtk.main()
+        
     except KeyboardInterrupt:
         mswitch.quit()
         sys.exit(1)        
