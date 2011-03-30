@@ -13,7 +13,11 @@ import webbrowser
 import jld_scripts.system.mswitch as mswitch
 
 class AppPopupMenu:
-    def __init__(self, app):
+    def __init__(self, app, version):
+        if version is not None:
+            self.item_version = gtk.MenuItem( "version: %s" % version, False)
+            self.item_version.set_sensitive(False)
+        
         self.item_disable_eventor = gtk.CheckMenuItem( "Disable Eventor input control", True)
         self.item_sound_only = gtk.CheckMenuItem( "Sound Control Only", True)
         self.item_exit = gtk.MenuItem( "exit", True)
@@ -32,6 +36,9 @@ class AppPopupMenu:
         self.menu.append( self.item_show )
         self.menu.append( self.item_help )
         self.menu.append( self.item_exit )        
+        if version is not None:
+            self.menu.append( self.item_version)        
+        
         self.menu.show_all()
 
     def show_menu(self, button, time):
@@ -59,11 +66,11 @@ class AppIcon(object):
 
 
 class TrayAgent(object):
-    def __init__(self, app_name, icon_path, icon_file, help_url):
+    def __init__(self, app_name, icon_path, icon_file, help_url, version=None):
         
         self.app_name=app_name
         self.help_url=help_url
-        self.popup_menu=AppPopupMenu(self)
+        self.popup_menu=AppPopupMenu(self, version)
         
         self.tray=gtk.StatusIcon()
         self.tray.set_visible(True)

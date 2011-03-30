@@ -8,6 +8,7 @@
 """
 import sys
 
+APP_VERSION="1.0"
 APP_NAME="SqueezeCenter Utils"
 ICON_NAME="squeezecenter.gif"
 HELP_URL="http://www.systemical.com/doc/opensource/squeezecenter_utils"
@@ -52,7 +53,7 @@ def main(debug=False):
         icon_path=get_res_path()
         
         from jld_scripts.agents.squeeze_tray import TrayAgent
-        _ta=TrayAgent(APP_NAME, icon_path, ICON_NAME, HELP_URL)
+        _ta=TrayAgent(APP_NAME, icon_path, ICON_NAME, HELP_URL, APP_VERSION)
 
         import jld_scripts.agents.mk_dbus #@UnusedImport
         import jld_scripts.agents.squeeze #@UnusedImport
