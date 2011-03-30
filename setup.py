@@ -5,7 +5,7 @@
     @author: Jean-Lou Dupont
 """
 __author__  ="Jean-Lou Dupont"
-__version__ ="0.8.7"
+__version__ ="0.8.8"
 
 from distutils.core import setup
 from setuptools import find_packages

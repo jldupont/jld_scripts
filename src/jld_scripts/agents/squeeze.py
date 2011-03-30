@@ -188,11 +188,15 @@ class SqueezeAgent(AgentThreadedBase):
             self._debug("! received unsupported Eventor msg: "+msg)
             return
         
+        #print "info: %s" % info
+        
         state=info.get("state", None)
         type=info.get("type", None)
         if type is None or state is None:
-            self._debug("! can't find 'type'/'state' field(s) in: "+info)
+            #self._debug("! can't find 'type'/'state' field(s) in: %s" % info)
             return
+        
+        #print "info.type: %s" % type
         
         if type.lower()=="incomingcall":
             if state.lower()=="ringing":
