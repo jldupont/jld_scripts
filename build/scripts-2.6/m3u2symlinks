@@ -1,7 +1,0 @@
-#!/usr/bin/python
-"""
-	@author: Jean-Lou Dupont
-"""
-from jld_scripts.scripts.m3u2symlinks import main
-
-main()
